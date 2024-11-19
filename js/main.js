@@ -1,33 +1,58 @@
 (() => {
-  const initBurgerMenu = () => {
+  const initNavigationBar = () => {
     const burgerMenu = document.querySelector(".burger");
     const navBar = document.querySelector("nav");
     let navBarStatus = false;
 
-    if (window.getComputedStyle(navBar).overflow === "hidden") {
-      const navHeight = navBar.offsetHeight;
+    // Helper function to close the menu
+    const closeMenu = () => {
       navBar.style.height = "0px";
+      burgerMenu?.classList.remove("changeBurger");
+      navBarStatus = false;
+    };
 
-      const toggleMenu = () => {
-        if (navBarStatus) {
-          navBarStatus = false;
-          navBar.style.height = "0px";
-          burgerMenu.classList.remove("changeBurger");
-        } else {
-          navBarStatus = true;
-          navBar.style.height = navHeight + "px";
-          burgerMenu.classList.add("changeBurger");
-        }
-      };
+    // Helper function to open the menu
+    const openMenu = () => {
+      const navHeight = navBar.scrollHeight; // Dynamically get the height
+      navBar.style.height = `${navHeight}px`;
+      burgerMenu?.classList.add("changeBurger");
+      navBarStatus = true;
+    };
 
+    // Toggles the menu open/close
+    const toggleMenu = () => {
+      navBarStatus ? closeMenu() : openMenu();
+    };
+
+    // Initialize burger menu behavior
+    if (burgerMenu && !burgerMenu.dataset.listenerAdded) {
       burgerMenu.addEventListener("click", toggleMenu);
+      burgerMenu.dataset.listenerAdded = "true"; // Use data attribute to mark listener added
     }
+
+    // Close the menu by default
+    closeMenu();
   };
 
   const handleResize = () => {
-    initBurgerMenu();
+    const navBar = document.querySelector("nav");
+    const isDesktop = window.innerWidth >= 720; // Threshold for desktop view
+
+    if (isDesktop) {
+      navBar.style.height = "auto"; // Ensure nav is fully visible on desktop
+    } else {
+      navBar.style.height = "0px"; // Reset nav height for mobile
+      initNavigationBar(); // Re-initialize burger menu for mobile
+    }
   };
 
-  initBurgerMenu();
-  window.addEventListener("resize", handleResize);
+  // Initialize on page load
+  const init = () => {
+    initNavigationBar();
+    handleResize();
+    window.addEventListener("resize", handleResize);
+  };
+
+  // Execute initialization
+  init();
 })();
